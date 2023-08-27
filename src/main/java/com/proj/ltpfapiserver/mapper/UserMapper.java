@@ -15,7 +15,7 @@ public interface UserMapper {
     @Param("username") String username
   );
 
-  @Insert("INSERT INTO User.User (is_admin, first_name, last_name, email, phone, username, password, address) VALUES (#{isAdmin}, #{firstName}, #{lastName}, #{email}, #{phone}, #{username}, #{password}, #{address})")
+  @Insert("INSERT INTO User.User (isAdmin, firstName, lastName, email, phone, username, password, address) VALUES (#{isAdmin}, #{firstName}, #{lastName}, #{email}, #{phone}, #{username}, #{password}, #{address})")
   void insertUser(User user);
 
   @Select("SELECT * FROM User.User WHERE email = #{email}")
