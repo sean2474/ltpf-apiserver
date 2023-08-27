@@ -103,4 +103,34 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Error verifying password"));
     }
   }
+
+  @GetMapping("/check-username-exists")
+  public ResponseEntity<Map<String, Object>> checkUsernameExists(@RequestBody HashMap<String, String> user) {
+    String username = user.get("username");
+    User foundUser = userMapper.findByUsername(username);
+    if (foundUser == null) {
+      return ResponseEntity.ok(Collections.singletonMap("message", "Username does not exist"));
+    }
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Username already exists"));
+  }
+
+  @GetMapping("/check-email-exists") 
+  public ResponseEntity<Map<String, Object>> checkEmailExists(@RequestBody HashMap<String, String> user) {
+    String email = user.get("email");
+    User foundUser = userMapper.findByEmail(email);
+    if (foundUser == null) {
+      return ResponseEntity.ok(Collections.singletonMap("message", "Email does not exist"));
+    }
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Email already exists"));
+  }
+
+  @GetMapping("/check-phone-exists")
+  public ResponseEntity<Map<String, Object>> checkPhoneExists(@RequestBody HashMap<String, String> user) {
+    String phone = user.get("phone");
+    User foundUser = userMapper.findByPhone(phone);
+    if (foundUser == null) {
+      return ResponseEntity.ok(Collections.singletonMap("message", "Phone does not exist"));
+    }
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Phone already exists"));
+  }
 }
