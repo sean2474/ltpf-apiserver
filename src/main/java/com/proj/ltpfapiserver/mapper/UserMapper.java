@@ -13,10 +13,10 @@ public interface UserMapper {
   @Select("SELECT * FROM User.User WHERE username = #{username}")
   User findByUsername(@Param("username") String username);
 
-  @Insert("INSERT INTO User.User (isAdmin, firstName, lastName, email, phone, username, password, address) VALUES (#{isAdmin}, #{firstName}, #{lastName}, #{email}, #{phone}, #{username}, #{password}, #{address})")
+  @Insert("INSERT INTO User.User (isAdmin, firstName, lastName, email, phone, username, password, address, accountType) VALUES (#{isAdmin}, #{firstName}, #{lastName}, #{email}, #{phone}, #{username}, #{password}, #{address}, #{accountType})")
   void insertUser(User user);
 
-  @Insert("UPDATE User.User SET isAdmin = #{isAdmin}, firstName = #{firstName}, lastName = #{lastName}, email = #{email}, phone = #{phone}, username = #{username}, password = #{password}, address = #{address} WHERE id = #{id}")
+  @Insert("UPDATE User.User SET isAdmin = #{isAdmin}, firstName = #{firstName}, lastName = #{lastName}, email = #{email}, phone = #{phone}, username = #{username}, password = #{password}, address = #{address} accountType = {accountType} WHERE id = #{id}")
   void changeUser(User user);
 
   @Delete("DELETE FROM User.User WHERE username = #{username}")

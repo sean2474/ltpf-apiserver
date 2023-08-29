@@ -13,6 +13,8 @@ import lombok.ToString;
 @ToString
 public class Contact {
   private int id;
+  private String dateTime;
+  private int submitterId;
   private String title;
   private String firstName;
   private String lastName;

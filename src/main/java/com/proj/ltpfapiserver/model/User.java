@@ -30,4 +30,5 @@ public class User {
   private String password;
   @ToString.Exclude
   private String address;
+  private String accountType; // email, google, naver, kakao
 }
