@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import com.proj.ltpfapiserver.util.JwtUtil;
 
 @RestController
 @RequestMapping("/data/item")
+@CrossOrigin(origins = "http://localhost:3000, http://ltpf-test.com:3000, http://ltpf.org")
 public class ItemController {
   @Autowired
   private ItemMapper itemMapper;
@@ -58,7 +60,7 @@ public class ItemController {
 
   @PutMapping("/{id}")
   public ResponseEntity<Map<String, Object>> updateItem(@PathVariable int id, @RequestHeader("Authorization") String authHeader, @RequestBody Item item) {
-    if (!isAdmin(authHeader)) {
+    if (!isAdmin(authHeader) && !isSubmitter(authHeader, itemMapper.findById(id).getSubmitterId())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access denied"));
     }
     Item existingItem = itemMapper.findById(id);
@@ -72,7 +74,7 @@ public class ItemController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Map<String, Object>> deleteItem(@PathVariable int id, @RequestHeader("Authorization") String authHeader) {
-    if (!isAdmin(authHeader)) {
+    if (!isAdmin(authHeader) && !isSubmitter(authHeader, itemMapper.findById(id).getSubmitterId())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access denied"));
     }
     Item existingItem = itemMapper.findById(id);
@@ -88,5 +90,12 @@ public class ItemController {
     String username = JwtUtil.decode(jwt).getSubject();
     User user = userMapper.findByUsername(username);
     return user != null && user.isAdmin();
+  }
+
+  private boolean isSubmitter(String authHeader, int submitterId) {
+    String jwt = authHeader.split(" ")[1];
+    String username = JwtUtil.decode(jwt).getSubject();
+    User user = userMapper.findByUsername(username);
+    return user != null && user.getId() == submitterId;
   }
 }
