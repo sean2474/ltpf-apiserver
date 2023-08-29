@@ -7,8 +7,10 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -22,6 +24,7 @@ import com.proj.ltpfapiserver.util.SecurityUtil;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "http://localhost:3000, http://ltpf-test.com:3000, http://ltpf.org")
 public class UserController {
 
   @Autowired
@@ -104,7 +107,7 @@ public class UserController {
     }
   }
 
-  @GetMapping("/check-username-exists")
+  @PostMapping("/check-username-exists")
   public ResponseEntity<Map<String, Object>> checkUsernameExists(@RequestBody HashMap<String, String> user) {
     String username = user.get("username");
     User foundUser = userMapper.findByUsername(username);
@@ -114,7 +117,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Username already exists"));
   }
 
-  @GetMapping("/check-email-exists") 
+  @PostMapping("/check-email-exists") 
   public ResponseEntity<Map<String, Object>> checkEmailExists(@RequestBody HashMap<String, String> user) {
     String email = user.get("email");
     User foundUser = userMapper.findByEmail(email);
@@ -124,7 +127,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "Email already exists"));
   }
 
-  @GetMapping("/check-phone-exists")
+  @PostMapping("/check-phone-exists")
   public ResponseEntity<Map<String, Object>> checkPhoneExists(@RequestBody HashMap<String, String> user) {
     String phone = user.get("phone");
     User foundUser = userMapper.findByPhone(phone);

@@ -14,25 +14,19 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface ItemMapper {
+  @Insert("INSERT INTO User.Item (submitterId, title, description, category, extraInfo) VALUES (#{submitterId}, #{title}, #{description}, #{category}, #{extraInfo})")
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  void insertItem(Item item);
 
-    // Create (Insert) an item
-    @Insert("INSERT INTO User.Item (submitterId, title, description, category, extraInfo) VALUES (#{submitterId}, #{title}, #{description}, #{category}, #{extraInfo})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insertItem(Item item);
+  @Select("SELECT * FROM User.Item")
+  List<Item> findAll();
 
-    // Read (Select) all items
-    @Select("SELECT * FROM User.Item")
-    List<Item> findAll();
+  @Select("SELECT * FROM User.Item WHERE id = #{id}")
+  Item findById(@Param("id") int id);
 
-    // Read (Select) an item by its ID
-    @Select("SELECT * FROM User.Item WHERE id = #{id}")
-    Item findById(@Param("id") int id);
+  @Update("UPDATE User.Item SET submitterId = #{submitterId}, title = #{title}, description = #{description}, category = #{category}, extraInfo = #{extraInfo} WHERE id = #{id}")
+  void updateItem(Item item);
 
-    // Update an item by its ID
-    @Update("UPDATE User.Item SET submitterId = #{submitterId}, title = #{title}, description = #{description}, category = #{category}, extraInfo = #{extraInfo} WHERE id = #{id}")
-    void updateItem(Item item);
-
-    // Delete an item by its ID
-    @Delete("DELETE FROM User.Item WHERE id = #{id}")
-    void deleteItem(@Param("id") int id);
+  @Delete("DELETE FROM User.Item WHERE id = #{id}")
+  void deleteItem(@Param("id") int id);
 }
