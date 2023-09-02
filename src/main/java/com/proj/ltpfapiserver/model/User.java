@@ -31,4 +31,5 @@ public class User {
   @ToString.Exclude
   private String address;
   private String accountType; // email, google, naver, kakao
+  private boolean isVerified;
 }

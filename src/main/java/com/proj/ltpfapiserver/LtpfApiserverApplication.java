@@ -5,9 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-public class LtpfApiserverApplication {
+public class LtpfapiserverApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LtpfApiserverApplication.class, args);
+		SpringApplication.run(LtpfapiserverApplication.class, args);
 	}
+
 }

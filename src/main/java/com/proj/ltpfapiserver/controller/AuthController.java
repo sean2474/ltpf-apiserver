@@ -1,6 +1,7 @@
 package com.proj.ltpfapiserver.controller;
 
 import com.proj.ltpfapiserver.model.User;
+import com.proj.ltpfapiserver.email.service.EmailVerificationService;
 import com.proj.ltpfapiserver.mapper.UserMapper;
 import com.proj.ltpfapiserver.util.JwtUtil;
 import com.proj.ltpfapiserver.util.SecurityUtil;
@@ -22,6 +23,9 @@ public class AuthController {
 
   @Autowired
   private UserMapper userMapper;
+
+  @Autowired
+  private EmailVerificationService emailVerificationService;
 
   @PostMapping("/login")
   public ResponseEntity<Map<String, Object>> verifyUser(@RequestBody HashMap<String, String> user) {
@@ -57,14 +61,19 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"));
       }
       String hashedPassword = SecurityUtil.hashPassword(newUser.getPassword());
+      Map<String, Object> response = new HashMap<>();
+      String jwtToken = JwtUtil.generateToken(newUser);
+
+      emailVerificationService.sendVerificationEmail(newUser.getEmail());
+
       newUser.setPassword(hashedPassword);
       newUser.setAdmin(false);
       userMapper.insertUser(newUser);
-      Map<String, Object> response = new HashMap<>();
       response.put("message", "User created successfully");
       response.put("user", newUser);
-      String jwtToken = JwtUtil.generateToken(newUser);
       response.put("jwt", jwtToken);
+
+
       return ResponseEntity.ok(response);
     } catch (Exception e) {
       System.out.println(e.getMessage());
@@ -72,21 +81,27 @@ public class AuthController {
     }
   }
 
-  @GetMapping("/check-email")
-  public boolean isEmailUnique(@RequestParam String email) {
-    User user = userMapper.findByEmail(email);
-    return user == null; 
-  }
+  @PostMapping("/verify-email")
+  public ResponseEntity<Map<String, Object>> verifyEmail(@RequestBody HashMap<String, String> reqBody) {
+    String emailToVerify = reqBody.get("email");
+    int code = 0;
+    try {
+      code = Integer.parseInt(reqBody.get("code"));
+    } catch (NumberFormatException e) {
+      return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Verification code should be integer"));
+    }
 
-  @GetMapping("/check-username")
-  public boolean isUsernameUnique(@RequestParam String username) {
-    User user = userMapper.findByUsername(username);
-    return user == null; 
-  }
-
-  @GetMapping("/check-phone")
-  public boolean isPhoneUnique(@RequestParam String phone) {
-    User user = userMapper.findByPhone(phone);
-    return user == null;
+    try {
+      if (emailVerificationService.verifyEmail(emailToVerify, code)) {
+        User user = userMapper.findByEmail(emailToVerify);
+        user.setVerified(true);
+        userMapper.verifyUser(user);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Email verified successfully"));
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Invalid verification code"));
+      }
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Error verifying email"));
+    }
   }
 }
